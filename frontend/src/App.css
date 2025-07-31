@@ -1,0 +1,365 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+}
+
+.App {
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Smooth transitions */
+* {
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, 
+              border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/* Custom button hover effects */
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Card hover effects */
+.hover\:shadow-md:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Custom focus styles */
+input:focus, textarea:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #3b82f6;
+  ring-offset: 2px;
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Currency formatting */
+.currency {
+  font-family: 'Inter', monospace;
+  font-weight: 600;
+}
+
+/* Responsive grid improvements */
+@media (max-width: 768px) {
+  .grid-cols-1.lg\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+  
+  .grid-cols-1.md\:grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Custom badge styles */
+.badge-paid {
+  background-color: #10b981;
+  color: white;
+}
+
+.badge-unpaid {
+  background-color: #f59e0b;
+  color: white;
+}
+
+/* Image preview styles */
+.image-preview-container {
+  position: relative;
+  display: inline-block;
+}
+
+.image-preview-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.image-preview-container:hover .image-preview-overlay {
+  opacity: 1;
+}
+
+/* Enhanced card styles */
+.credit-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.customer-card {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.stats-card {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+}
+
+/* Custom input styles */
+.form-input {
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  transition: all 0.2s ease-in-out;
+}
+
+.form-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Print styles */
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  body {
+    background: white !important;
+    font-size: 12pt !important;
+    line-height: 1.4 !important;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-bill-content {
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0.5in !important;
+    box-shadow: none !important;
+    border: none !important;
+    page-break-inside: avoid;
+    min-height: auto !important;
+  }
+  
+  .print-bill-content h1 {
+    font-size: 24pt !important;
+    color: #000 !important;
+    margin-bottom: 12pt !important;
+  }
+  
+  .print-bill-content h2 {
+    font-size: 16pt !important;
+    color: #000 !important;
+    margin: 12pt 0 8pt 0 !important;
+  }
+  
+  .print-bill-content h3 {
+    font-size: 14pt !important;
+    color: #000 !important;
+  }
+  
+  .print-bill-content table {
+    page-break-inside: avoid;
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin: 8pt 0 !important;
+  }
+  
+  .print-bill-content table th,
+  .print-bill-content table td {
+    border: 1pt solid #000 !important;
+    padding: 6pt !important;
+    font-size: 10pt !important;
+  }
+  
+  .print-bill-content table th {
+    background-color: #f0f0f0 !important;
+    font-weight: bold !important;
+    color: #000 !important;
+  }
+  
+  /* Ensure colors print correctly */
+  .print-bill-content .bg-gray-800 {
+    background-color: #2d3748 !important;
+    color: white !important;
+  }
+  
+  .print-bill-content .bg-blue-50 {
+    background-color: #ebf8ff !important;
+  }
+  
+  .print-bill-content .bg-green-50 {
+    background-color: #f0fff4 !important;
+  }
+  
+  .print-bill-content .bg-red-50 {
+    background-color: #fef5e7 !important;
+  }
+  
+  .print-bill-content .bg-yellow-50 {
+    background-color: #fffff0 !important;
+  }
+  
+  .print-bill-content .text-blue-700 {
+    color: #2b6cb0 !important;
+  }
+  
+  .print-bill-content .text-green-700 {
+    color: #047857 !important;
+  }
+  
+  .print-bill-content .text-red-700 {
+    color: #b91c1c !important;
+  }
+  
+  /* Border styles */
+  .print-bill-content .border-l-4 {
+    border-left: 4pt solid !important;
+  }
+  
+  .print-bill-content .border-blue-500 {
+    border-color: #3b82f6 !important;
+  }
+  
+  .print-bill-content .border-green-500 {
+    border-color: #10b981 !important;
+  }
+  
+  .print-bill-content .border-red-500 {
+    border-color: #ef4444 !important;
+  }
+  
+  .print-bill-content .border-yellow-200 {
+    border-color: #fde68a !important;
+  }
+  
+  /* Page breaks */
+  .print-bill-content .page-break-before {
+    page-break-before: always;
+  }
+  
+  .print-bill-content .page-break-after {
+    page-break-after: always;
+  }
+  
+  /* Hide shadows and effects that don't print well */
+  .print-bill-content .shadow,
+  .print-bill-content .shadow-md,
+  .print-bill-content .shadow-lg {
+    box-shadow: none !important;
+  }
+  
+  /* Ensure proper spacing */
+  .print-bill-content .mb-8 {
+    margin-bottom: 16pt !important;
+  }
+  
+  .print-bill-content .mb-4 {
+    margin-bottom: 8pt !important;
+  }
+  
+  .print-bill-content .mt-4 {
+    margin-top: 8pt !important;
+  }
+  
+  /* Currency formatting */
+  .print-bill-content .text-2xl {
+    font-size: 16pt !important;
+  }
+  
+  .print-bill-content .text-3xl {
+    font-size: 20pt !important;
+  }
+  
+  .print-bill-content .text-lg {
+    font-size: 12pt !important;
+  }
+  
+  .print-bill-content .text-sm {
+    font-size: 10pt !important;
+  }
+  
+  .print-bill-content .text-xs {
+    font-size: 8pt !important;
+  }
+}
