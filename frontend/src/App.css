@@ -195,37 +195,23 @@ input:focus, textarea:focus {
 
 /* Print styles */
 @media print {
+  /* Hide everything in the body by default */
   body * {
     visibility: hidden;
   }
+
+  /* Then, make the bill content and all its children visible */
   .print-bill-content,
   .print-bill-content * {
     visibility: visible;
   }
+
+  /* Position the bill content to fill the page. */
   .print-bill-content {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
-  }
-
-  * {
-    -webkit-print-color-adjust: exact !important;
-    color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-  
-  body {
-    background: white !important;
-    font-size: 12pt !important;
-    line-height: 1.4 !important;
-  }
-  
-  .no-print {
-    display: none !important;
-  }
-  
-  .print-bill-content {
     max-width: none !important;
     margin: 0 !important;
     padding: 0.5in !important;
@@ -233,6 +219,28 @@ input:focus, textarea:focus {
     border: none !important;
     page-break-inside: avoid;
     min-height: auto !important;
+  }
+
+  /* Force colors and backgrounds to print */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  /* Set body to a white background for printing */
+  html, body {
+    background: white !important;
+  }
+
+  body {
+    font-size: 12pt !important;
+    line-height: 1.4 !important;
+  }
+  
+  /* Hide any elements with the .no-print class */
+  .no-print {
+    display: none !important;
   }
   
   .print-bill-content h1 {
