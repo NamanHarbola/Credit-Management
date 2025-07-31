@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:5000';
 const API = `${BACKEND_URL}/api`;
 
 function App() {
@@ -63,13 +63,6 @@ function App() {
     loadCustomers();
     loadDashboardStats();
   }, []);
-
-  // Auto-save effect
-  useEffect(() => {
-    if (customers.length > 0) {
-      // Auto-save is handled by the backend, but we could add local storage here if needed
-    }
-  }, [customers, creditEntries]);
 
   const loadCustomers = async () => {
     try {
@@ -141,7 +134,6 @@ function App() {
   };
 
   const handleDeleteCustomer = async (customerId) => {
-    // Show confirmation dialog
     const confirmed = window.confirm(
       'Are you sure you want to delete this customer?\n\n' +
       'This will also delete all their credit entries and cannot be undone.\n\n' +
@@ -156,11 +148,9 @@ function App() {
       await axios.delete(`${API}/customers/${customerId}`);
       toast.success('Customer deleted successfully');
       
-      // Refresh the data
       await loadCustomers();
       await loadDashboardStats();
       
-      // Clear selection if the deleted customer was selected
       if (selectedCustomer && selectedCustomer.id === customerId) {
         setSelectedCustomer(null);
         setCreditEntries([]);
@@ -169,7 +159,6 @@ function App() {
       toast.error('Failed to delete customer. Please try again.');
       console.error('Error deleting customer:', error);
       
-      // Show more detailed error if available
       if (error.response && error.response.data && error.response.data.detail) {
         toast.error(`Error: ${error.response.data.detail}`);
       }
@@ -183,7 +172,6 @@ function App() {
     }
 
     try {
-      // Fix timezone issue by creating date at noon to avoid day shifting
       const fixedDate = new Date(newCreditEntry.date);
       fixedDate.setHours(12, 0, 0, 0);
 
@@ -199,7 +187,7 @@ function App() {
       setNewCreditEntry({ amount: '', description: '', date: new Date(), image_data: null });
       setShowCreditDialog(false);
       loadCreditEntries(selectedCustomer.id);
-      loadCustomers(); // Refresh to update totals
+      loadCustomers();
       loadDashboardStats();
     } catch (error) {
       toast.error('Failed to add credit entry');
@@ -217,14 +205,14 @@ function App() {
       await axios.put(`${API}/credit-entries/${editingCreditEntry.id}`, {
         amount: parseFloat(editingCreditEntry.amount),
         description: editingCreditEntry.description,
-        date: editingCreditEntry.date.toISOString(),
+        date: new Date(editingCreditEntry.date).toISOString(),
         image_data: editingCreditEntry.image_data
       });
       
       toast.success('Credit entry updated successfully');
       setEditingCreditEntry(null);
       loadCreditEntries(selectedCustomer.id);
-      loadCustomers(); // Refresh to update totals
+      loadCustomers();
       loadDashboardStats();
     } catch (error) {
       toast.error('Failed to update credit entry');
@@ -241,7 +229,7 @@ function App() {
       
       toast.success('Payment status updated');
       loadCreditEntries(selectedCustomer.id);
-      loadCustomers(); // Refresh to update totals
+      loadCustomers();
       loadDashboardStats();
     } catch (error) {
       toast.error('Failed to update payment status');
@@ -258,7 +246,7 @@ function App() {
       await axios.delete(`${API}/credit-entries/${entryId}`);
       toast.success('Credit entry deleted successfully');
       loadCreditEntries(selectedCustomer.id);
-      loadCustomers(); // Refresh to update totals
+      loadCustomers();
       loadDashboardStats();
     } catch (error) {
       toast.error('Failed to delete credit entry');
@@ -282,15 +270,12 @@ function App() {
   };
 
   const handlePrintBill = async (customer) => {
-    // Make sure we load the credit entries for this customer first
     try {
       const response = await axios.get(`${API}/credit-entries/${customer.id}`);
       const customerCreditEntries = response.data;
       
-      // Set the customer for print dialog and update credit entries if needed
       setShowPrintBill({...customer, creditEntries: customerCreditEntries});
       
-      // If this customer is not currently selected, we need to ensure credit entries are available
       if (!selectedCustomer || selectedCustomer.id !== customer.id) {
         setCreditEntries(customerCreditEntries);
       }
@@ -305,7 +290,7 @@ function App() {
     return new Intl.NumberFormat('en-IN', {
       style: 'currency',
       currency: 'INR'
-    }).format(amount);
+    }).format(amount || 0);
   };
 
   // Print Bill Component
@@ -315,18 +300,18 @@ function App() {
     const outstanding = totalCredit - totalPaid;
 
     return (
-      <div className="print-bill-content bg-white p-8 max-w-4xl mx-auto min-h-screen">
+      <div className="print-bill-content bg-white p-8 max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 border-b-4 border-gray-800 pb-6">
           <h1 className="text-4xl font-bold text-gray-900 mb-2 tracking-wide">CREDIT STATEMENT</h1>
           <p className="text-lg text-gray-700 font-medium">Statement of Account</p>
           <div className="mt-4 text-sm text-gray-600">
             <p>Generated on: {format(new Date(), 'PPPP')}</p>
-            <p>Statement #: CS-{customer.id.substr(-6).toUpperCase()}</p>
+            <p>Statement #: CS-{(customer.id || 'N/A').toString().substr(-6).toUpperCase()}</p>
           </div>
         </div>
 
-        {/* Business Header - You can customize this */}
+        {/* Business Header */}
         <div className="text-center mb-8 bg-gray-50 p-6 rounded-lg border-2 border-gray-200">
           <h2 className="text-2xl font-bold text-gray-800 mb-2">MADAN ELECTRICALS</h2>
           <p className="text-gray-600">Address: Your Business Address</p>
@@ -344,9 +329,9 @@ function App() {
                 {customer.address && <p className="text-gray-700"><strong>Address:</strong> {customer.address}</p>}
               </div>
               <div className="text-right">
-                <p className="text-sm text-gray-600">Customer ID: {customer.id.substr(-8).toUpperCase()}</p>
+                <p className="text-sm text-gray-600">Customer ID: {(customer.id || 'N/A').toString().substr(-8).toUpperCase()}</p>
                 <p className="text-sm text-gray-600">Statement Date: {format(new Date(), 'PP')}</p>
-                <p className="text-sm text-gray-600">Due Date: {format(new Date(), 'PP')}</p>
+                <p className="text-sm text-gray-600">Due Date: {format(new Date(new Date().setDate(new Date().getDate() + 30)), 'PP')}</p>
               </div>
             </div>
           </div>
@@ -494,7 +479,7 @@ function App() {
                 <TrendingUp className="h-8 w-8 text-green-600" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Total Credit</p>
-                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(dashboardStats.total_credit || 0)}</p>
+                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(dashboardStats.total_credit)}</p>
                 </div>
               </div>
             </CardContent>
@@ -506,7 +491,7 @@ function App() {
                 <Wallet className="h-8 w-8 text-blue-600" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Total Paid</p>
-                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(dashboardStats.total_paid || 0)}</p>
+                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(dashboardStats.total_paid)}</p>
                 </div>
               </div>
             </CardContent>
@@ -518,7 +503,7 @@ function App() {
                 <TrendingDown className="h-8 w-8 text-red-600" />
                 <div className="ml-4">
                   <p className="text-sm font-medium text-gray-600">Outstanding</p>
-                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(dashboardStats.total_outstanding || 0)}</p>
+                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(dashboardStats.total_outstanding)}</p>
                 </div>
               </div>
             </CardContent>
@@ -647,7 +632,7 @@ function App() {
                           <p className="text-xs text-gray-500 mt-1">
                             {format(new Date(entry.date), 'PPP')}
                           </p>
-                          {entry.is_paid && entry.paid_amount && (
+                          {entry.is_paid && entry.paid_amount > 0 && (
                             <p className="text-xs text-green-600 mt-1">
                               Paid: {formatCurrency(entry.paid_amount)}
                             </p>
@@ -685,6 +670,7 @@ function App() {
                               const paidAmount = newStatus ? entry.amount : 0;
                               handleUpdatePaymentStatus(entry.id, newStatus, paidAmount);
                             }}
+                            title={entry.is_paid ? "Mark as Unpaid" : "Mark as Paid"}
                           >
                             {entry.is_paid ? <X className="w-4 h-4" /> : <Check className="w-4 h-4" />}
                           </Button>
@@ -692,6 +678,8 @@ function App() {
                             size="sm"
                             variant="ghost"
                             onClick={() => handleDeleteCreditEntry(entry.id)}
+                            className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                            title="Delete Entry"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -721,7 +709,7 @@ function App() {
           <DialogHeader>
             <DialogTitle>Add New Customer</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-4 py-4">
             <div>
               <Label htmlFor="customer-name">Name *</Label>
               <Input
@@ -766,7 +754,7 @@ function App() {
             <DialogTitle>Edit Customer</DialogTitle>
           </DialogHeader>
           {editingCustomer && (
-            <div className="space-y-4">
+            <div className="space-y-4 py-4">
               <div>
                 <Label htmlFor="edit-customer-name">Name *</Label>
                 <Input
@@ -809,9 +797,9 @@ function App() {
       <Dialog open={showCreditDialog} onOpenChange={setShowCreditDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Add Credit Entry</DialogTitle>
+            <DialogTitle>Add Credit Entry for {selectedCustomer?.name}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-4 py-4">
             <div>
               <Label htmlFor="credit-amount">Amount (₹) *</Label>
               <Input
@@ -835,9 +823,9 @@ function App() {
               <Label>Date</Label>
               <Popover>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start text-left">
+                  <Button variant="outline" className="w-full justify-start text-left font-normal">
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {format(newCreditEntry.date, 'PPP')}
+                    {newCreditEntry.date ? format(newCreditEntry.date, 'PPP') : <span>Pick a date</span>}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0">
@@ -857,6 +845,7 @@ function App() {
                 type="file"
                 accept="image/*"
                 onChange={handleImageUpload}
+                className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
               />
               {newCreditEntry.image_data && (
                 <div className="mt-2">
@@ -885,7 +874,7 @@ function App() {
             <DialogTitle>Edit Credit Entry</DialogTitle>
           </DialogHeader>
           {editingCreditEntry && (
-            <div className="space-y-4">
+            <div className="space-y-4 py-4">
               <div>
                 <Label htmlFor="edit-credit-amount">Amount (₹) *</Label>
                 <Input
@@ -909,15 +898,15 @@ function App() {
                 <Label>Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left">
+                    <Button variant="outline" className="w-full justify-start text-left font-normal">
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {format(editingCreditEntry.date, 'PPP')}
+                      {editingCreditEntry.date ? format(new Date(editingCreditEntry.date), 'PPP') : <span>Pick a date</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
                     <Calendar
                       mode="single"
-                      selected={editingCreditEntry.date}
+                      selected={new Date(editingCreditEntry.date)}
                       onSelect={(date) => setEditingCreditEntry({ ...editingCreditEntry, date: date || new Date() })}
                       initialFocus
                     />
@@ -931,6 +920,7 @@ function App() {
                   type="file"
                   accept="image/*"
                   onChange={(e) => handleImageUpload(e, true)}
+                  className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 />
                 {editingCreditEntry.image_data && (
                   <div className="mt-2">
@@ -955,16 +945,22 @@ function App() {
 
       {/* Print Bill Dialog */}
       <Dialog open={!!showPrintBill} onOpenChange={() => setShowPrintBill(null)}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-5xl h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Print Customer Bill</DialogTitle>
           </DialogHeader>
           {showPrintBill && (
-            <div>
+            <div className="flex-grow overflow-y-auto">
               <div className="flex justify-end mb-4 no-print">
                 <Button
                   onClick={() => {
+                    const printContent = document.querySelector('.print-bill-content');
+                    const originalContents = document.body.innerHTML;
+                    document.body.innerHTML = printContent.innerHTML;
                     window.print();
+                    document.body.innerHTML = originalContents;
+                    // We need to reload to re-attach React event handlers
+                    window.location.reload();
                   }}
                   className="bg-blue-600 hover:bg-blue-700"
                 >
@@ -988,11 +984,11 @@ function App() {
             <DialogTitle>Image Preview</DialogTitle>
           </DialogHeader>
           {showImagePreview && (
-            <div className="flex justify-center">
+            <div className="flex justify-center py-4">
               <img
                 src={showImagePreview}
                 alt="Credit entry attachment"
-                className="max-w-full max-h-96 object-contain rounded"
+                className="max-w-full max-h-[70vh] object-contain rounded"
               />
             </div>
           )}
