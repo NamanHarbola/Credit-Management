@@ -183,11 +183,15 @@ function App() {
     }
 
     try {
+      // Fix timezone issue by creating date at noon to avoid day shifting
+      const fixedDate = new Date(newCreditEntry.date);
+      fixedDate.setHours(12, 0, 0, 0);
+
       await axios.post(`${API}/credit-entries`, {
         customer_id: selectedCustomer.id,
         amount: parseFloat(newCreditEntry.amount),
         description: newCreditEntry.description,
-        date: newCreditEntry.date.toISOString(),
+        date: fixedDate.toISOString(),
         image_data: newCreditEntry.image_data
       });
       
