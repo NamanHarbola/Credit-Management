@@ -195,6 +195,20 @@ input:focus, textarea:focus {
 
 /* Print styles */
 @media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-bill-content,
+  .print-bill-content * {
+    visibility: visible;
+  }
+  .print-bill-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+
   * {
     -webkit-print-color-adjust: exact !important;
     color-adjust: exact !important;

@@ -328,7 +328,7 @@ function App() {
 
         {/* Business Header - You can customize this */}
         <div className="text-center mb-8 bg-gray-50 p-6 rounded-lg border-2 border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">YOUR BUSINESS NAME</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">MADAN ELECTRICALS</h2>
           <p className="text-gray-600">Address: Your Business Address</p>
           <p className="text-gray-600">Phone: Your Phone Number | Email: your@email.com</p>
         </div>
